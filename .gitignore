@@ -1,41 +1,11 @@
-# Prerequisites
-*.d
+# Ignore the entire build directory and everything in it.
+# This one line replaces your entire list (it catches *.o, *.exe,
+# *.a, executables, test files, Makefiles, etc.)
+/build/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Ignore user-specific VS Code settings
+/.vscode/
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# Ignore system-specific files (good practice)
+.DS_Store
+Thumbs.db

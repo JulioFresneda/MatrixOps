@@ -74,3 +74,36 @@ TEST(OpsTest, ChainedAddition) {
         }
     }
 }
+
+
+// Add this new TEST block to tests/test_ops.cpp
+
+TEST(OpsTest, MatrixMultiplication) {
+    // A = | 1  2 |
+    //     | 3  4 |
+    mtx::Matrix<double> A(2, 2);
+    A.at(0, 0) = 1.0; A.at(0, 1) = 2.0;
+    A.at(1, 0) = 3.0; A.at(1, 1) = 4.0;
+
+    // B = | 5  6 |
+    //     | 7  8 |
+    mtx::Matrix<double> B(2, 2);
+    B.at(0, 0) = 5.0; B.at(0, 1) = 6.0;
+    B.at(1, 0) = 7.0; B.at(1, 1) = 8.0;
+
+    // --- Execute ---
+    mtx::Matrix<double> C = A * B;
+
+    // --- Assert ---
+    // A * B should be:
+    // C = | (1*5 + 2*7)  (1*6 + 2*8) | = | 19  22 |
+    //     | (3*5 + 4*7)  (3*6 + 4*8) |   | 43  50 |
+    
+    ASSERT_EQ(C.rows(), 2);
+    ASSERT_EQ(C.cols(), 2);
+
+    ASSERT_DOUBLE_EQ(C.at(0, 0), 19.0);
+    ASSERT_DOUBLE_EQ(C.at(0, 1), 22.0);
+    ASSERT_DOUBLE_EQ(C.at(1, 0), 43.0);
+    ASSERT_DOUBLE_EQ(C.at(1, 1), 50.0);
+}
