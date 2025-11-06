@@ -19,7 +19,7 @@ target_link_libraries(run_app PRIVATE matrix_ops)
 # GoogleTest setup
 enable_testing()
 find_package(GTest REQUIRED)
-add_executable(run_tests tests/test_io.cpp tests/test_ops.cpp)
+add_executable(run_tests tests/test_io.cpp tests/test_ops.cpp tests/test_linalg.cpp)
 target_link_libraries(run_tests PRIVATE matrix_ops GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(run_tests)

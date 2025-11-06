@@ -107,3 +107,151 @@ TEST(OpsTest, MatrixMultiplication) {
     ASSERT_DOUBLE_EQ(C.at(1, 0), 43.0);
     ASSERT_DOUBLE_EQ(C.at(1, 1), 50.0);
 }
+
+TEST(OpsTest, ChainedSubtraction) {
+    mtx::Matrix<double> A(5, 5);
+    mtx::Matrix<double> B(5, 5);
+    mtx::Matrix<double> C(5, 5);
+    
+    // Fill with known values
+    for (size_t r = 0; r < 5; ++r) {
+        for (size_t c = 0; c < 5; ++c) {
+            A.at(r, c) = 10.0;
+            B.at(r, c) = 2.0;
+            C.at(r, c) = 3.0;
+        }
+    }
+
+    // --- Execute ---
+    // Test (A - B) - C
+    mtx::Matrix<double> D = A - B - C;
+
+    // --- Assert ---
+    for (size_t r = 0; r < 5; ++r) {
+        for (size_t c = 0; c < 5; ++c) {
+            // 10.0 - 2.0 - 3.0 = 5.0
+            ASSERT_DOUBLE_EQ(D.at(r, c), 5.0);
+        }
+    }
+}
+
+TEST(OpsTest, Transpose) {
+    // A = | 1  2  3 |
+    //     | 4  5  6 |
+    mtx::Matrix<double> A(2, 3);
+    A.at(0, 0) = 1.0; A.at(0, 1) = 2.0; A.at(0, 2) = 3.0;
+    A.at(1, 0) = 4.0; A.at(1, 1) = 5.0; A.at(1, 2) = 6.0;
+
+    // --- Test 1: Simple Transpose ---
+    // This calls the "evaluating" constructor
+    mtx::Matrix<double> B = A.transpose();
+    
+    ASSERT_EQ(B.rows(), 3); // Original cols
+    ASSERT_EQ(B.cols(), 2); // Original rows
+
+    // Check A.at(r, c) == B.at(c, r)
+    ASSERT_DOUBLE_EQ(B.at(0, 1), A.at(1, 0)); // 4.0
+    ASSERT_DOUBLE_EQ(B.at(2, 0), A.at(0, 2)); // 3.0
+    ASSERT_DOUBLE_EQ(B.at(1, 1), A.at(1, 1)); // 5.0
+}
+
+TEST(OpsTest, ChainedTranspose) {
+    // A (2x3)
+    mtx::Matrix<double> A(2, 3);
+    A.fill_random(1.0, 5.0);
+    
+    // B (3x2)
+    mtx::Matrix<double> B(3, 2);
+    B.fill_random(10.0, 20.0);
+
+    // --- Test 2: Chained Expression ---
+    // C = A.transpose() + B
+    // This creates a MatrixSum<MatrixTranspose<...>, Matrix<...>>
+    // No temporary matrix for A.transpose() should be created!
+    mtx::Matrix<double> C = A.transpose() + B;
+
+    ASSERT_EQ(C.rows(), 3);
+    ASSERT_EQ(C.cols(), 2);
+
+    for (size_t r = 0; r < 3; ++r) {
+        for (size_t c = 0; c < 2; ++c) {
+            // Check that C[r][c] = A[c][r] + B[r][c]
+            ASSERT_DOUBLE_EQ(C.at(r, c), A.at(c, r) + B.at(r, c));
+        }
+    }
+}
+
+TEST(OpsTest, ScalarOperations) {
+    mtx::Matrix<double> A(5, 5);
+    A.fill_random(1.0, 5.0);
+    
+    mtx::Matrix<double> B(5, 5);
+    B.fill_random(10.0, 20.0);
+
+    const double scalar = 3.0;
+
+    // --- Test 1: Simple scalar multiply ---
+    mtx::Matrix<double> C = A * scalar;
+    ASSERT_DOUBLE_EQ(C.at(0, 0), A.at(0, 0) * scalar);
+    ASSERT_DOUBLE_EQ(C.at(1, 2), A.at(1, 2) * scalar);
+
+    // --- Test 2: Scalar multiply first ---
+    mtx::Matrix<double> D = scalar * A;
+    ASSERT_DOUBLE_EQ(D.at(0, 0), scalar * A.at(0, 0));
+    ASSERT_DOUBLE_EQ(D.at(2, 1), scalar * A.at(2, 1));
+
+    // --- Test 3: Fully Chained Expression ---
+    // E = (A * 3.0) + (3.0 * B)
+    // This should all be one lazy expression, evaluated in one pass.
+    mtx::Matrix<double> E = (A * scalar) + (scalar * B);
+    for (size_t r = 0; r < 5; ++r) {
+        for (size_t c = 0; c < 5; ++c) {
+            ASSERT_DOUBLE_EQ(E.at(r, c), (A.at(r, c) * scalar) + (scalar * B.at(r, c)));
+        }
+    }
+}
+
+TEST(OpsTest, ScalarDivision) {
+    mtx::Matrix<double> A(5, 5);
+    A.fill_random(100.0, 200.0);
+    
+    mtx::Matrix<double> B(5, 5);
+    B.fill_random(10.0, 20.0);
+
+    const double scalar = 2.0;
+
+    // --- Test 1: Simple scalar division ---
+    mtx::Matrix<double> C = A / scalar;
+    ASSERT_DOUBLE_EQ(C.at(0, 0), A.at(0, 0) / scalar);
+
+    // --- Test 2: Fully Chained Expression ---
+    // E = (A / 2.0) - (B * 3.0)
+    mtx::Matrix<double> E = (A / scalar) - (B * 3.0);
+    for (size_t r = 0; r < 5; ++r) {
+        for (size_t c = 0; c < 5; ++c) {
+            ASSERT_DOUBLE_EQ(E.at(r, c), (A.at(r, c) / scalar) - (B.at(r, c) * 3.0));
+        }
+    }
+}
+
+TEST(OpsTest, ScalarAddition) {
+    mtx::Matrix<double> A(5, 5);
+    A.fill_random(10.0, 20.0);
+
+    const double scalar = 100.0;
+
+    // --- Test 1: A + scalar ---
+    mtx::Matrix<double> C = A + scalar;
+    ASSERT_DOUBLE_EQ(C.at(0, 0), A.at(0, 0) + scalar);
+
+    // --- Test 2: scalar + A ---
+    mtx::Matrix<double> D = scalar + A;
+    ASSERT_DOUBLE_EQ(D.at(1, 1), scalar + A.at(1, 1));
+    
+    // --- Test 3: Chained ---
+    // E = (A + 100.0) / 2.0
+    mtx::Matrix<double> E = (A + scalar) / 2.0;
+    ASSERT_DOUBLE_EQ(E.at(2, 2), (A.at(2, 2) + scalar) / 2.0);
+}
+
+

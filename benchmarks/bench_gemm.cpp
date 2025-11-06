@@ -19,7 +19,7 @@ static void BM_MatrixMultiply_Naive(benchmark::State& state) {
     // This is the loop that Google Benchmark runs
     for (auto _ : state) {
         // --- This is the code being measured ---
-        mtx::Matrix<double> C = A * B;
+        mtx::Matrix<double> C = mtx::gemm_naive(A, B);
         // ----------------------------------------
 
         // Tell the compiler not to optimize away our result,
