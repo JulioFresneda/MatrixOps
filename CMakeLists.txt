@@ -12,7 +12,7 @@ target_compile_options(matrix_ops INTERFACE -mavx2)
 find_package(OpenMP REQUIRED)
 target_link_libraries(matrix_ops INTERFACE OpenMP::OpenMP_CXX)
 
-add_executable(run_app src/main.cpp)
+add_executable(run_app src/examples.cpp)
 
 target_link_libraries(run_app PRIVATE matrix_ops)
 

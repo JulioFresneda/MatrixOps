@@ -1,6 +1,12 @@
 #include <benchmark/benchmark.h>
 #include "matrix/Matrix.hpp"
 
+// Benchmark configuration constants
+// Change these once to affect all matrix multiplication benchmarks
+static constexpr int BM_RANGE_MULTIPLIER = 2;
+static constexpr int BM_RANGE_MIN = 8;
+static constexpr int BM_RANGE_MAX = 4096;
+
 // @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // @@@@@@@@@@@@@@@@@@@@@@@@@@ BENCHMARK TIME @@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -106,33 +112,33 @@ static void BM_MatrixMultiply_Multithreaded(benchmark::State& state) {
 
 
 BENCHMARK(BM_MatrixMultiply_Naive)
-    ->RangeMultiplier(2)
-    ->Range(8, 512)
+    ->RangeMultiplier(BM_RANGE_MULTIPLIER)
+    ->Range(BM_RANGE_MIN, BM_RANGE_MAX)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK(BM_MatrixMultiply_Reordered)
-    ->RangeMultiplier(2)
-    ->Range(8, 512)
+    ->RangeMultiplier(BM_RANGE_MULTIPLIER)
+    ->Range(BM_RANGE_MIN, BM_RANGE_MAX)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK(BM_MatrixMultiply_Tiled)
-    ->RangeMultiplier(2)
-    ->Range(8, 512)
+    ->RangeMultiplier(BM_RANGE_MULTIPLIER)
+    ->Range(BM_RANGE_MIN, BM_RANGE_MAX)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK(BM_MatrixMultiply_Tiled_Raw)
-    ->RangeMultiplier(2)
-    ->Range(8, 512)
+    ->RangeMultiplier(BM_RANGE_MULTIPLIER)
+    ->Range(BM_RANGE_MIN, BM_RANGE_MAX)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK(BM_MatrixMultiply_Tiled_Raw_SIMD)
-    ->RangeMultiplier(2)
-    ->Range(8, 512)
+    ->RangeMultiplier(BM_RANGE_MULTIPLIER)
+    ->Range(BM_RANGE_MIN, BM_RANGE_MAX)
     ->Unit(benchmark::kMillisecond);
 
 BENCHMARK(BM_MatrixMultiply_Multithreaded)
-    ->RangeMultiplier(2)
-    ->Range(8, 512)
+    ->RangeMultiplier(BM_RANGE_MULTIPLIER)
+    ->Range(BM_RANGE_MIN, BM_RANGE_MAX)
     ->Unit(benchmark::kMillisecond)
     // GBenchmark must know
     ->UseRealTime();
